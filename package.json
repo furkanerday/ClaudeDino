@@ -7,11 +7,6 @@
   "bin": {
     "claudedino": "dist/cli.js"
   },
-  "files": [
-    "dist",
-    "src",
-    "tsconfig.json"
-  ],
   "engines": {
     "node": ">=22.0.0"
   },
