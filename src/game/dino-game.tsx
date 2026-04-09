@@ -182,12 +182,8 @@ function DinoGame({ claudeState }: DinoGameProps): React.ReactNode {
 
         // 5. Spawn obstacles
         let distanceSinceLastObstacle = previous.distanceSinceLastObstacle + speed;
-        const spawnCheckWorld: GameWorld = {
-          ...previous,
-          distanceSinceLastObstacle,
-        };
 
-        if (shouldSpawnObstacle(spawnCheckWorld, columns)) {
+        if (shouldSpawnObstacle({ ...previous, distanceSinceLastObstacle }, columns)) {
           obstacles = [...obstacles, spawnObstacle(previous, columns)];
           distanceSinceLastObstacle = 0;
         }
@@ -219,7 +215,8 @@ function DinoGame({ claudeState }: DinoGameProps): React.ReactNode {
           }))
           .filter((cloud) => cloud.x >= -20);
 
-        if (Math.random() < 0.005) {
+        const MAX_CLOUDS = 15;
+        if (clouds.length < MAX_CLOUDS && Math.random() < 0.005) {
           clouds = [
             ...clouds,
             {
