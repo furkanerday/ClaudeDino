@@ -16,7 +16,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "prepare": "tsc",
+    "prepare": "npx tsc",
     "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
