@@ -12,6 +12,7 @@
 When Claude Code is processing a task, the user waits with nothing to do. The input bar is disabled — dead UI. Users lose attention, switch tabs, and disengage.
 
 **ClaudeDino** repurposes this dead time with a playable game that:
+
 - Keeps users engaged inside Claude Code
 - Encourages users to keep submitting tasks (to keep playing)
 - Showcases a creative Claude Code companion tool on GitHub
@@ -69,6 +70,7 @@ claudedino
 ```
 
 The `claudedino` command:
+
 1. Detects OS and terminal emulator
 2. Auto-splits the pane and launches the game in the bottom half
 3. Configures Claude Code hooks in `~/.claude/settings.json` (first run only)
@@ -99,23 +101,23 @@ HIDDEN ──(Claude starts)──► COUNTDOWN ──(0)──► PLAYING ─�
 
 ### 3.1 State Definitions
 
-| State | Game Area Visible | Input Captured | Description |
-|-------|-------------------|----------------|-------------|
-| **HIDDEN** | Waiting screen | No | Claude is idle. Shows "Waiting for Claude..." message in the game pane. |
-| **COUNTDOWN** | Yes | No | Shows "3...2...1" centered in game area. Lasts 3 seconds. |
-| **PLAYING** | Yes | Yes (space, ↑, ↓) | Active gameplay. Obstacles scroll, dino runs. |
-| **PAUSED** | Yes | No | Claude finished. Game frozen. "PAUSED" overlay. Score and all positions preserved. |
-| **GAME_OVER** | Yes | No | Collision occurred. "GAME OVER — Score: X" shown. Frozen. |
+| State         | Game Area Visible | Input Captured    | Description                                                                        |
+| ------------- | ----------------- | ----------------- | ---------------------------------------------------------------------------------- |
+| **HIDDEN**    | Waiting screen    | No                | Claude is idle. Shows "Waiting for Claude..." message in the game pane.            |
+| **COUNTDOWN** | Yes               | No                | Shows "3...2...1" centered in game area. Lasts 3 seconds.                          |
+| **PLAYING**   | Yes               | Yes (space, ↑, ↓) | Active gameplay. Obstacles scroll, dino runs.                                      |
+| **PAUSED**    | Yes               | No                | Claude finished. Game frozen. "PAUSED" overlay. Score and all positions preserved. |
+| **GAME_OVER** | Yes               | No                | Collision occurred. "GAME OVER — Score: X" shown. Frozen.                          |
 
 ### 3.2 State Transitions
 
-| From | To | Trigger |
-|------|----|---------|
-| HIDDEN | COUNTDOWN | Claude begins processing a task |
-| COUNTDOWN | PLAYING | 3-second countdown reaches 0 |
-| PLAYING | PAUSED | Claude finishes processing (becomes idle) |
-| PLAYING | GAME_OVER | Dino collides with obstacle |
-| PAUSED | COUNTDOWN | Claude begins processing again |
+| From      | To        | Trigger                                            |
+| --------- | --------- | -------------------------------------------------- |
+| HIDDEN    | COUNTDOWN | Claude begins processing a task                    |
+| COUNTDOWN | PLAYING   | 3-second countdown reaches 0                       |
+| PLAYING   | PAUSED    | Claude finishes processing (becomes idle)          |
+| PLAYING   | GAME_OVER | Dino collides with obstacle                        |
+| PAUSED    | COUNTDOWN | Claude begins processing again                     |
 | GAME_OVER | COUNTDOWN | Claude begins processing again (score resets to 0) |
 
 ### 3.3 Edge Cases
@@ -138,10 +140,10 @@ HIDDEN ──(Claude starts)──► COUNTDOWN ──(0)──► PLAYING ─�
 
 ### 4.2 Controls
 
-| Key | Action | When |
-|-----|--------|------|
-| `Space` | Jump | PLAYING state only |
-| `↑` (Arrow Up) | Jump | PLAYING state only |
+| Key              | Action      | When               |
+| ---------------- | ----------- | ------------------ |
+| `Space`          | Jump        | PLAYING state only |
+| `↑` (Arrow Up)   | Jump        | PLAYING state only |
 | `↓` (Arrow Down) | Crouch/duck | PLAYING state only |
 
 - Jump: dino rises for ~0.3s, hangs briefly, falls for ~0.3s
@@ -153,18 +155,18 @@ HIDDEN ──(Claude starts)──► COUNTDOWN ──(0)──► PLAYING ─�
 
 **Ground obstacles (must jump):**
 
-| Variant | Width | Height | Description |
-|---------|-------|--------|-------------|
-| Small cactus | 2 cols | 3 rows | Single short cactus |
-| Large cactus | 2 cols | 5 rows | Single tall cactus |
+| Variant      | Width  | Height | Description            |
+| ------------ | ------ | ------ | ---------------------- |
+| Small cactus | 2 cols | 3 rows | Single short cactus    |
+| Large cactus | 2 cols | 5 rows | Single tall cactus     |
 | Cactus group | 5 cols | 4 rows | Two cacti side by side |
 
 **Air obstacles (must crouch):**
 
-| Variant | Width | Height | Altitude | Description |
-|---------|-------|--------|----------|-------------|
-| Bird (high) | 4 cols | 2 rows | Row 2-3 | Flapping bird, must crouch |
-| Bird (mid) | 4 cols | 2 rows | Row 3-4 | Can jump over or crouch under |
+| Variant     | Width  | Height | Altitude | Description                   |
+| ----------- | ------ | ------ | -------- | ----------------------------- |
+| Bird (high) | 4 cols | 2 rows | Row 2-3  | Flapping bird, must crouch    |
+| Bird (mid)  | 4 cols | 2 rows | Row 3-4  | Can jump over or crouch under |
 
 ### 4.4 Obstacle Spawning
 
@@ -182,13 +184,13 @@ HIDDEN ──(Claude starts)──► COUNTDOWN ──(0)──► PLAYING ─�
 
 ### 4.6 Difficulty Progression
 
-| Score Range | Speed Multiplier | Obstacles Available |
-|-------------|-----------------|---------------------|
-| 0-99 | 1.0x | Small cactus only |
-| 100-199 | 1.15x | Small + large cactus |
-| 200-399 | 1.3x | All cacti + birds |
-| 400-699 | 1.5x | All, higher spawn rate |
-| 700+ | 1.7x (capped) | All, max spawn rate |
+| Score Range | Speed Multiplier | Obstacles Available    |
+| ----------- | ---------------- | ---------------------- |
+| 0-99        | 1.0x             | Small cactus only      |
+| 100-199     | 1.15x            | Small + large cactus   |
+| 200-399     | 1.3x             | All cacti + birds      |
+| 400-699     | 1.5x             | All, higher spawn rate |
+| 700+        | 1.7x (capped)    | All, max spawn rate    |
 
 ---
 
@@ -222,6 +224,7 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ### 5.3 Sprite Definitions
 
 **Dino — Running Frame 1:**
+
 ```
  ████
 ██▄██
@@ -232,6 +235,7 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ```
 
 **Dino — Running Frame 2:**
+
 ```
  ████
 ██▄██
@@ -242,6 +246,7 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ```
 
 **Dino — Jumping:**
+
 ```
  ████
 ██▄██
@@ -252,6 +257,7 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ```
 
 **Dino — Crouching:**
+
 ```
  █████
 ██▄████
@@ -259,6 +265,7 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ```
 
 **Small Cactus:**
+
 ```
  █
 ██
@@ -266,6 +273,7 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ```
 
 **Large Cactus:**
+
 ```
  █
 ██
@@ -275,6 +283,7 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ```
 
 **Cactus Group:**
+
 ```
  █  █
 ██ ██
@@ -283,18 +292,21 @@ Total height: **8 rows** (1 score + 6 play area + 1 ground), full terminal width
 ```
 
 **Bird — Wings Up:**
+
 ```
 ▀ ▀
 ████
 ```
 
 **Bird — Wings Down:**
+
 ```
 ████
 ▄ ▄
 ```
 
 **Cloud:**
+
 ```
  ░░
 ░░░░
@@ -304,32 +316,38 @@ Note: These are reference sprites. Final pixel art will be refined during implem
 
 ### 5.4 Animations
 
-| Element | Animation | Frame Rate |
-|---------|-----------|------------|
-| Dino running | Alternates between Frame 1 and Frame 2 | Every 8 game ticks |
-| Bird flapping | Alternates wings up / wings down | Every 12 game ticks |
-| Clouds | Drift leftward at 0.5x obstacle speed | Continuous |
-| Score flash | Score text inverts (dark on light) for 8 ticks | Every 100 points |
-| Ground | Dashed pattern scrolls left to add motion feel | Continuous |
+| Element       | Animation                                      | Frame Rate          |
+| ------------- | ---------------------------------------------- | ------------------- |
+| Dino running  | Alternates between Frame 1 and Frame 2         | Every 8 game ticks  |
+| Bird flapping | Alternates wings up / wings down               | Every 12 game ticks |
+| Clouds        | Drift leftward at 0.5x obstacle speed          | Continuous          |
+| Score flash   | Score text inverts (dark on light) for 8 ticks | Every 100 points    |
+| Ground        | Dashed pattern scrolls left to add motion feel | Continuous          |
 
 ### 5.5 Overlay States
 
 **Countdown:**
+
 ```
 ═══════════════════════ 3 ═══════════════════════
 ```
+
 Number centered in game area, changes each second. Game area is visible but frozen (shows last state or empty field if first run).
 
 **Paused:**
+
 ```
                     ║ PAUSED ║
 ```
+
 Centered overlay on frozen game. All positions preserved.
 
 **Game Over:**
+
 ```
                GAME OVER  Score: 00142
 ```
+
 Centered overlay on frozen game.
 
 ---
@@ -503,6 +521,7 @@ Hooks are tagged with a comment-like identifier so ClaudeDino can find and updat
 ### 10.2 Auto-Split Terminal
 
 The CLI entry point (`src/cli.ts`) handles:
+
 1. Parse args (`--attach` skips auto-split)
 2. Detect platform and terminal via environment variables (`$TERM_PROGRAM`, `$TMUX`, OS detection)
 3. If not `--attach`: execute platform-specific split, launch `claudedino --attach` in the new pane, exit the original process
@@ -521,6 +540,7 @@ The CLI entry point (`src/cli.ts`) handles:
 ## 11. Scope Boundaries
 
 ### In Scope
+
 - Dino runner game with jump and crouch
 - Ground obstacles (3 cactus variants) and air obstacles (birds)
 - Score and session high score
@@ -530,6 +550,7 @@ The CLI entry point (`src/cli.ts`) handles:
 - Monochrome rendering
 
 ### Out of Scope
+
 - Sound effects
 - Color/themes
 - Persistent high scores across sessions

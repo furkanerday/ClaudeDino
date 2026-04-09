@@ -98,7 +98,6 @@ Controls only work while the game is active (Claude is working). When Claude is 
 
 ClaudeDino hooks into Claude Code's event system by adding hooks to your `~/.claude/settings.json`. These hooks write a tiny state flag whenever Claude starts or finishes processing. The game watches this flag and reacts instantly.
 
-
 ## License
 
 MIT
