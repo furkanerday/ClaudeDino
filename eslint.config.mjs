@@ -63,6 +63,10 @@ export default tseslint.config(
           format: ["camelCase", "UPPER_CASE"],
         },
         {
+          selector: "function",
+          format: ["camelCase", "PascalCase"],
+        },
+        {
           selector: "typeLike",
           format: ["PascalCase"],
         },
