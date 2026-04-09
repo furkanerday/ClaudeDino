@@ -7,10 +7,16 @@
   "bin": {
     "claudedino": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "src",
+    "tsconfig.json"
+  ],
   "engines": {
     "node": ">=22.0.0"
   },
   "scripts": {
+    "prepare": "tsc",
     "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -22,17 +28,17 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
-    "@types/node": "^22.14.1",
-    "@types/react": "^19.2.14",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-unicorn": "^59.0.1",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.0"
   },
   "dependencies": {
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.2.14",
     "ink": "^7.0.0",
-    "react": "^19.2.5"
+    "react": "^19.2.5",
+    "typescript": "^5.8.3"
   }
 }
