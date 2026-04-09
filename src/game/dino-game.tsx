@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Text, useInput } from "ink";
-import useStdoutDimensions from "ink-use-stdout-dimensions";
+import { Box, Text, useInput, useStdout } from "ink";
 
 import {
   type GameWorld,
@@ -69,7 +68,8 @@ function createInitialWorld(highScore: number): GameWorld {
 // ---------------------------------------------------------------------------
 
 function DinoGame({ claudeState }: DinoGameProps): React.ReactNode {
-  const [columns] = useStdoutDimensions();
+  const { stdout } = useStdout();
+  const columns = stdout.columns;
   const [gameState, setGameState] = useState<GameState>(GameState.Hidden);
   const [world, setWorld] = useState<GameWorld>(() => createInitialWorld(0));
   const [countdown, setCountdown] = useState<number>(COUNTDOWN_SECONDS);

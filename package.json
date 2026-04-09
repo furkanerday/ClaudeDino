@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "ink": "^7.0.0",
-    "ink-use-stdout-dimensions": "^1.0.5",
     "react": "^19.2.5"
   }
 }
