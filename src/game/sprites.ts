@@ -1,19 +1,6 @@
-import {
-  type DinoPose,
-  type ObstacleType,
-  BIRD_ANIMATION_TICKS,
-  RUN_ANIMATION_TICKS,
-} from "./types.js";
-
-// ---------------------------------------------------------------------------
-// Sprite type
-// ---------------------------------------------------------------------------
+import { BIRD_ANIMATION_TICKS, DinoPose, ObstacleType, RUN_ANIMATION_TICKS } from "./types.js";
 
 export type Sprite = readonly string[];
-
-// ---------------------------------------------------------------------------
-// Dino sprites
-// ---------------------------------------------------------------------------
 
 const DINO_RUN1: Sprite = [
   " \u2588\u2588\u2588\u2588",
@@ -49,15 +36,11 @@ const DINO_CROUCH: Sprite = [
 ] as const;
 
 export const DINO_SPRITES: Record<DinoPose, Sprite> = {
-  run1: DINO_RUN1,
-  run2: DINO_RUN2,
-  jump: DINO_JUMP,
-  crouch: DINO_CROUCH,
+  [DinoPose.Run1]: DINO_RUN1,
+  [DinoPose.Run2]: DINO_RUN2,
+  [DinoPose.Jump]: DINO_JUMP,
+  [DinoPose.Crouch]: DINO_CROUCH,
 } as const;
-
-// ---------------------------------------------------------------------------
-// Obstacle sprites
-// ---------------------------------------------------------------------------
 
 const SMALL_CACTUS: Sprite = [" \u2588", "\u2588\u2588", "\u2588\u2588"] as const;
 
@@ -81,22 +64,14 @@ const BIRD_WINGS_UP: Sprite = ["\u2580 \u2580", "\u2588\u2588\u2588\u2588"] as c
 const BIRD_WINGS_DOWN: Sprite = ["\u2588\u2588\u2588\u2588", "\u2584 \u2584"] as const;
 
 export const OBSTACLE_SPRITES: Record<ObstacleType, Sprite> = {
-  smallCactus: SMALL_CACTUS,
-  largeCactus: LARGE_CACTUS,
-  cactusGroup: CACTUS_GROUP,
-  birdHigh: BIRD_WINGS_UP,
-  birdMid: BIRD_WINGS_UP,
+  [ObstacleType.SmallCactus]: SMALL_CACTUS,
+  [ObstacleType.LargeCactus]: LARGE_CACTUS,
+  [ObstacleType.CactusGroup]: CACTUS_GROUP,
+  [ObstacleType.BirdHigh]: BIRD_WINGS_UP,
+  [ObstacleType.BirdMid]: BIRD_WINGS_UP,
 } as const;
 
-// ---------------------------------------------------------------------------
-// Cloud sprite
-// ---------------------------------------------------------------------------
-
 export const CLOUD: Sprite = [" \u2591\u2591", "\u2591\u2591\u2591\u2591"] as const;
-
-// ---------------------------------------------------------------------------
-// Animation helpers
-// ---------------------------------------------------------------------------
 
 export function getBirdSprite(tickCount: number): Sprite {
   const frame = Math.floor(tickCount / BIRD_ANIMATION_TICKS) % 2;
@@ -105,5 +80,5 @@ export function getBirdSprite(tickCount: number): Sprite {
 
 export function getDinoRunSprite(tickCount: number): DinoPose {
   const frame = Math.floor(tickCount / RUN_ANIMATION_TICKS) % 2;
-  return frame === 0 ? ("run1" as DinoPose) : ("run2" as DinoPose);
+  return frame === 0 ? DinoPose.Run1 : DinoPose.Run2;
 }

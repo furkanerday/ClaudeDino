@@ -4,11 +4,17 @@ import { Box, Text, useInput, useStdout } from "ink";
 import {
   type GameWorld,
   BASE_SPEED,
+  CLOUD_CULL_X,
+  CLOUD_MAX_Y,
+  CLOUD_SPAWN_PROBABILITY,
+  CLOUD_SPEED_FACTOR,
   COUNTDOWN_SECONDS,
   ClaudeState,
   DinoPose,
   GameState,
+  MAX_CLOUDS,
   SCORE_INCREMENT_TICKS,
+  SPAWN_X_OFFSET,
   TICK_INTERVAL_MS,
 } from "./types.js";
 import {
@@ -22,26 +28,18 @@ import {
 import { getCurrentSpeed, moveObstacles, shouldSpawnObstacle, spawnObstacle } from "./obstacles.js";
 import { renderFrame } from "./renderer.js";
 
-// ---------------------------------------------------------------------------
-// Props
-// ---------------------------------------------------------------------------
+function noop(): void {
+  // intentionally empty
+}
 
 interface DinoGameProps {
   claudeState: ClaudeState;
 }
 
-// ---------------------------------------------------------------------------
-// Input ref
-// ---------------------------------------------------------------------------
-
 interface InputState {
   jump: boolean;
   crouchHeld: boolean;
 }
-
-// ---------------------------------------------------------------------------
-// Initial world factory
-// ---------------------------------------------------------------------------
 
 function createInitialWorld(highScore: number): GameWorld {
   return {
@@ -62,10 +60,6 @@ function createInitialWorld(highScore: number): GameWorld {
     distanceSinceLastObstacle: 0,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
 
 function DinoGame({ claudeState }: DinoGameProps): React.ReactNode {
   const { stdout } = useStdout();
@@ -118,9 +112,7 @@ function DinoGame({ claudeState }: DinoGameProps): React.ReactNode {
 
   useEffect(() => {
     if (gameState !== GameState.Countdown) {
-      return (): void => {
-        /* no-op */
-      };
+      return noop;
     }
 
     const interval = setInterval(() => {
@@ -145,9 +137,7 @@ function DinoGame({ claudeState }: DinoGameProps): React.ReactNode {
 
   useEffect(() => {
     if (gameState !== GameState.Playing) {
-      return (): void => {
-        /* no-op */
-      };
+      return noop;
     }
 
     const interval = setInterval(() => {
@@ -211,17 +201,16 @@ function DinoGame({ claudeState }: DinoGameProps): React.ReactNode {
         let clouds = previous.clouds
           .map((cloud) => ({
             ...cloud,
-            x: cloud.x - speed * 0.5,
+            x: cloud.x - speed * CLOUD_SPEED_FACTOR,
           }))
-          .filter((cloud) => cloud.x >= -20);
+          .filter((cloud) => cloud.x >= CLOUD_CULL_X);
 
-        const MAX_CLOUDS = 15;
-        if (clouds.length < MAX_CLOUDS && Math.random() < 0.005) {
+        if (clouds.length < MAX_CLOUDS && Math.random() < CLOUD_SPAWN_PROBABILITY) {
           clouds = [
             ...clouds,
             {
-              x: columns + 2,
-              y: Math.floor(Math.random() * 3),
+              x: columns + SPAWN_X_OFFSET,
+              y: Math.floor(Math.random() * CLOUD_MAX_Y),
             },
           ];
         }

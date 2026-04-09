@@ -22,8 +22,13 @@ export function detectPlatform(): Platform {
   return Platform.Linux;
 }
 
+function isEnvSet(key: string): boolean {
+  const value = process.env[key];
+  return value !== undefined && value !== "";
+}
+
 export function detectTerminal(): Terminal {
-  if (process.env["TMUX"] !== undefined && process.env["TMUX"] !== "") {
+  if (isEnvSet("TMUX")) {
     return Terminal.Tmux;
   }
 
@@ -37,7 +42,7 @@ export function detectTerminal(): Terminal {
     return Terminal.TerminalApp;
   }
 
-  if (process.env["WT_SESSION"] !== undefined && process.env["WT_SESSION"] !== "") {
+  if (isEnvSet("WT_SESSION")) {
     return Terminal.WindowsTerminal;
   }
 

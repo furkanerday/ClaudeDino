@@ -2,6 +2,8 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import { dirname, join } from "node:path";
 
+import { getStatePath } from "../state/watcher.js";
+
 const HOOK_TAG = "# claudedino";
 
 interface HookEntry {
@@ -24,11 +26,12 @@ function getSettingsPath(): string {
 }
 
 function readSettings(): ClaudeSettings {
-  const settingsPath = getSettingsPath();
-  if (!fs.existsSync(settingsPath)) {
+  try {
+    const buffer = fs.readFileSync(getSettingsPath());
+    return JSON.parse(buffer.toString()) as ClaudeSettings;
+  } catch {
     return {};
   }
-  return JSON.parse(fs.readFileSync(settingsPath).toString()) as ClaudeSettings;
 }
 
 function writeSettings(settings: ClaudeSettings): void {
@@ -36,10 +39,6 @@ function writeSettings(settings: ClaudeSettings): void {
   const dir = dirname(settingsPath);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(settingsPath, `${JSON.stringify(settings, undefined, 2)}\n`);
-}
-
-function buildStatePath(): string {
-  return join(os.tmpdir(), "claudedino-state");
 }
 
 function createHookEventConfig(matcher: string, command: string): HookEventConfig {
@@ -50,7 +49,7 @@ function createHookEventConfig(matcher: string, command: string): HookEventConfi
 }
 
 function buildHookEntries(): [string, HookEventConfig][] {
-  const statePath = buildStatePath();
+  const statePath = getStatePath();
 
   return [
     ["PreToolUse", createHookEventConfig("", `echo working > ${statePath} ${HOOK_TAG}`)],

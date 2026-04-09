@@ -17,16 +17,9 @@ import {
   getBirdSprite,
   getDinoRunSprite,
 } from "./sprites.js";
-
-// ---------------------------------------------------------------------------
-// Frame buffer type
-// ---------------------------------------------------------------------------
+import { getObstacleY } from "./physics.js";
 
 export type FrameBuffer = string[][];
-
-// ---------------------------------------------------------------------------
-// Buffer creation
-// ---------------------------------------------------------------------------
 
 export function createBuffer(width: number): FrameBuffer {
   const buffer: FrameBuffer = [];
@@ -41,10 +34,6 @@ export function createBuffer(width: number): FrameBuffer {
 
   return buffer;
 }
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
 
 function indexedChars(text: string): [number, string][] {
   const result: [number, string][] = [];
@@ -94,15 +83,17 @@ function drawSprite(command: SpriteDrawCommand): void {
   }
 }
 
-function drawGround(buffer: FrameBuffer, width: number, _offset: number): void {
+function drawGround(buffer: FrameBuffer, width: number, offset: number): void {
   const groundRow = buffer[GROUND_ROW];
   if (groundRow === undefined) {
     return;
   }
 
+  const roundedOffset = Math.round(offset);
   for (let col = 0; col < width; col++) {
     if (col < groundRow.length) {
-      groundRow[col] = "\u2550";
+      const pattern = (col + roundedOffset) % 4;
+      groundRow[col] = pattern === 0 ? "\u2500" : "\u2550";
     }
   }
 }
@@ -117,16 +108,9 @@ function drawObstacles(buffer: FrameBuffer, obstacles: Obstacle[], tickCount: nu
   for (const obstacle of obstacles) {
     const isBird =
       obstacle.type === ObstacleType.BirdHigh || obstacle.type === ObstacleType.BirdMid;
-
-    if (isBird) {
-      const sprite = getBirdSprite(tickCount);
-      const birdY = obstacle.type === ObstacleType.BirdHigh ? 2 : 3;
-      drawSprite({ buffer, sprite, x: obstacle.position.x, y: birdY });
-    } else {
-      const sprite = OBSTACLE_SPRITES[obstacle.type];
-      const obstacleY = GROUND_ROW - sprite.length;
-      drawSprite({ buffer, sprite, x: obstacle.position.x, y: obstacleY });
-    }
+    const sprite = isBird ? getBirdSprite(tickCount) : OBSTACLE_SPRITES[obstacle.type];
+    const y = getObstacleY(obstacle.type);
+    drawSprite({ buffer, sprite, x: obstacle.position.x, y });
   }
 }
 
@@ -183,10 +167,6 @@ function drawOverlay(buffer: FrameBuffer, width: number, text: string): void {
   writeText(row, startCol, text);
 }
 
-// ---------------------------------------------------------------------------
-// Scene drawing helper
-// ---------------------------------------------------------------------------
-
 function drawGameScene(buffer: FrameBuffer, world: GameWorld, width: number): void {
   drawGround(buffer, width, world.groundOffset);
   drawClouds(buffer, world.clouds);
@@ -200,17 +180,9 @@ function drawGameScene(buffer: FrameBuffer, world: GameWorld, width: number): vo
   });
 }
 
-// ---------------------------------------------------------------------------
-// Buffer to string
-// ---------------------------------------------------------------------------
-
 function bufferToString(buffer: FrameBuffer): string {
   return buffer.map((row) => row.join("")).join("\n");
 }
-
-// ---------------------------------------------------------------------------
-// Main render entry
-// ---------------------------------------------------------------------------
 
 interface RenderOptions {
   world: GameWorld;

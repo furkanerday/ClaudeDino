@@ -5,11 +5,8 @@ import {
   DIFFICULTY_TABLE,
   MIN_OBSTACLE_GAP,
   ObstacleType,
+  SPAWN_X_OFFSET,
 } from "./types.js";
-
-// ---------------------------------------------------------------------------
-// Difficulty lookup
-// ---------------------------------------------------------------------------
 
 function getCurrentTier(score: number): (typeof DIFFICULTY_TABLE)[number] {
   for (const tier of DIFFICULTY_TABLE) {
@@ -32,10 +29,6 @@ export function getCurrentSpeed(score: number): number {
   return BASE_SPEED * tier.speedMultiplier;
 }
 
-// ---------------------------------------------------------------------------
-// Available obstacle types by score
-// ---------------------------------------------------------------------------
-
 function getAvailableObstacleTypes(score: number): ObstacleType[] {
   const tier = getCurrentTier(score);
 
@@ -52,13 +45,9 @@ function getAvailableObstacleTypes(score: number): ObstacleType[] {
   return types;
 }
 
-// ---------------------------------------------------------------------------
-// Spawn logic
-// ---------------------------------------------------------------------------
-
 export function shouldSpawnObstacle(world: GameWorld, terminalWidth: number): boolean {
-  const speed = getCurrentSpeed(world.score);
   const tier = getCurrentTier(world.score);
+  const speed = BASE_SPEED * tier.speedMultiplier;
   const minGap = Math.max(MIN_OBSTACLE_GAP, Math.round(40 / speed));
   const spawnThreshold = minGap + Math.round((Math.random() * 15) / tier.spawnRateMultiplier);
 
@@ -73,15 +62,11 @@ export function spawnObstacle(world: GameWorld, terminalWidth: number): Obstacle
   return {
     type,
     position: {
-      x: terminalWidth + 2,
+      x: terminalWidth + SPAWN_X_OFFSET,
       y: 0,
     },
   };
 }
-
-// ---------------------------------------------------------------------------
-// Movement
-// ---------------------------------------------------------------------------
 
 export function moveObstacles(obstacles: Obstacle[], speed: number): Obstacle[] {
   return obstacles

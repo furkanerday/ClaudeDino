@@ -10,10 +10,6 @@ import {
 } from "./types.js";
 import { DINO_SPRITES, OBSTACLE_SPRITES } from "./sprites.js";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 interface HitBox {
   left: number;
   right: number;
@@ -22,24 +18,33 @@ interface HitBox {
 }
 
 function spriteWidth(sprite: readonly string[]): number {
-  return Math.max(...sprite.map((row) => row.length));
+  let max = 0;
+  for (const row of sprite) {
+    if (row.length > max) {
+      max = row.length;
+    }
+  }
+  return max;
 }
 
-function spriteHeight(sprite: readonly string[]): number {
-  return sprite.length;
-}
+// Pre-computed sprite dimensions (constant, never change)
+const DINO_RUN_WIDTH = spriteWidth(DINO_SPRITES[DinoPose.Run1]);
+const DINO_RUN_HEIGHT = DINO_SPRITES[DinoPose.Run1].length;
+const DINO_CROUCH_WIDTH = spriteWidth(DINO_SPRITES[DinoPose.Crouch]);
+const DINO_CROUCH_HEIGHT = DINO_SPRITES[DinoPose.Crouch].length;
+const DEFAULT_DINO_Y = GROUND_ROW - DINO_RUN_HEIGHT;
 
-// ---------------------------------------------------------------------------
-// Default dino Y
-// ---------------------------------------------------------------------------
+const OBSTACLE_WIDTHS = new Map<ObstacleType, number>();
+const OBSTACLE_HEIGHTS = new Map<ObstacleType, number>();
+for (const type of Object.values(ObstacleType)) {
+  const sprite = OBSTACLE_SPRITES[type];
+  OBSTACLE_WIDTHS.set(type, spriteWidth(sprite));
+  OBSTACLE_HEIGHTS.set(type, sprite.length);
+}
 
 export function getDefaultDinoY(): number {
-  return GROUND_ROW - spriteHeight(DINO_SPRITES[DinoPose.Run1]);
+  return DEFAULT_DINO_Y;
 }
-
-// ---------------------------------------------------------------------------
-// Jump
-// ---------------------------------------------------------------------------
 
 export function startJump(dino: DinoState): DinoState {
   if (dino.isJumping || dino.isCrouching) {
@@ -54,10 +59,6 @@ export function startJump(dino: DinoState): DinoState {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Crouch
-// ---------------------------------------------------------------------------
-
 export function startCrouch(dino: DinoState): DinoState {
   if (dino.isJumping) {
     return dino;
@@ -67,7 +68,7 @@ export function startCrouch(dino: DinoState): DinoState {
     ...dino,
     pose: DinoPose.Crouch,
     isCrouching: true,
-    y: GROUND_ROW - spriteHeight(DINO_SPRITES[DinoPose.Crouch]),
+    y: GROUND_ROW - DINO_CROUCH_HEIGHT,
   };
 }
 
@@ -79,10 +80,6 @@ export function stopCrouch(dino: DinoState): DinoState {
     y: getDefaultDinoY(),
   };
 }
-
-// ---------------------------------------------------------------------------
-// Gravity
-// ---------------------------------------------------------------------------
 
 export function applyGravity(dino: DinoState): DinoState {
   if (!dino.isJumping) {
@@ -110,25 +107,30 @@ export function applyGravity(dino: DinoState): DinoState {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Collision detection
-// ---------------------------------------------------------------------------
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
-function getDinoHitBox(dino: DinoState): HitBox {
-  const sprite = dino.isCrouching ? DINO_SPRITES[DinoPose.Crouch] : DINO_SPRITES[DinoPose.Run1];
-  const width = spriteWidth(sprite);
-  const height = spriteHeight(sprite);
-
+function buildHitBox(rect: Rect): HitBox {
   return {
-    left: DINO_X + 1,
-    right: DINO_X + width - 1,
-    top: dino.y + 1,
-    bottom: dino.y + height - 1,
+    left: rect.x + 1,
+    right: rect.x + rect.width - 1,
+    top: rect.y + 1,
+    bottom: rect.y + rect.height - 1,
   };
 }
 
-function getObstacleY(obstacle: Obstacle): number {
-  switch (obstacle.type) {
+function getDinoHitBox(dino: DinoState): HitBox {
+  const width = dino.isCrouching ? DINO_CROUCH_WIDTH : DINO_RUN_WIDTH;
+  const height = dino.isCrouching ? DINO_CROUCH_HEIGHT : DINO_RUN_HEIGHT;
+  return buildHitBox({ x: DINO_X, y: dino.y, width, height });
+}
+
+export function getObstacleY(type: ObstacleType): number {
+  switch (type) {
     case ObstacleType.BirdHigh: {
       return 2;
     }
@@ -140,27 +142,20 @@ function getObstacleY(obstacle: Obstacle): number {
     case ObstacleType.SmallCactus:
     case ObstacleType.LargeCactus:
     case ObstacleType.CactusGroup: {
-      return GROUND_ROW - spriteHeight(OBSTACLE_SPRITES[obstacle.type]);
+      return GROUND_ROW - (OBSTACLE_HEIGHTS.get(type) ?? 0);
     }
 
     default: {
-      return obstacle.type satisfies never;
+      return type satisfies never;
     }
   }
 }
 
 function getObstacleHitBox(obstacle: Obstacle): HitBox {
-  const sprite = OBSTACLE_SPRITES[obstacle.type];
-  const width = spriteWidth(sprite);
-  const height = spriteHeight(sprite);
-  const obstacleY = getObstacleY(obstacle);
-
-  return {
-    left: obstacle.position.x + 1,
-    right: obstacle.position.x + width - 1,
-    top: obstacleY + 1,
-    bottom: obstacleY + height - 1,
-  };
+  const width = OBSTACLE_WIDTHS.get(obstacle.type) ?? 0;
+  const height = OBSTACLE_HEIGHTS.get(obstacle.type) ?? 0;
+  const obstacleY = getObstacleY(obstacle.type);
+  return buildHitBox({ x: obstacle.position.x, y: obstacleY, width, height });
 }
 
 export function checkCollision(dino: DinoState, obstacle: Obstacle): boolean {
