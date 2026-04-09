@@ -85,6 +85,7 @@ export default tseslint.config(
       "unicorn/prevent-abbreviations": "off",
       "unicorn/filename-case": ["error", { case: "kebabCase" }],
       "unicorn/no-process-exit": "off",
+      "unicorn/import-style": ["error", { styles: { "node:path": { named: true } } }],
       "unicorn/numeric-separators-style": "off",
     },
   },
