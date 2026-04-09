@@ -16,8 +16,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "prepare": "node ./node_modules/typescript/bin/tsc",
-    "build": "tsc",
+        "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",

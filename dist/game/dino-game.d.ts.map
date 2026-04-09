@@ -1,0 +1,1 @@
+{"version":3,"file":"dino-game.d.ts","sourceRoot":"","sources":["../../src/game/dino-game.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAsC,MAAM,OAAO,CAAC;AAG3D,OAAO,EAQL,WAAW,EAOZ,MAAM,YAAY,CAAC;AAgBpB,UAAU,aAAa;IACrB,WAAW,EAAE,WAAW,CAAC;CAC1B;AA2BD,iBAAS,QAAQ,CAAC,EAAE,WAAW,EAAE,EAAE,aAAa,GAAG,KAAK,CAAC,SAAS,CAqNjE;AAED,eAAe,QAAQ,CAAC"}
